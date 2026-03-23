@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ComingSoon from '../components/ComingSoon.astro';
+---
+<Layout title="Presentaciones — CodeNinja">
+  <Header />
+  <main class="flex-1 flex flex-col">
+    <ComingSoon
+      title="Presentaciones"
+      subtitle="Las slides de cada clase van a estar disponibles acá. Volvé pronto."
+      emoji="🎯"
+    />
+  </main>
+  <Footer />
+</Layout>

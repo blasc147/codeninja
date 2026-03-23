@@ -1,0 +1,21 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  emoji?: string;
+}
+const { title, subtitle, emoji = '🥷' } = Astro.props;
+---
+<section class="flex flex-1 flex-col items-center justify-center px-4 py-32 text-center">
+  <div class="flex flex-col items-center gap-8 max-w-2xl">
+    <span class="text-8xl">{emoji}</span>
+    <div class="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-sm font-bold text-primary border border-primary/20">
+      🚧 En construcción
+    </div>
+    <h1 class="text-slate-900 dark:text-white text-5xl font-black leading-tight">{title}</h1>
+    <p class="text-slate-600 dark:text-slate-400 text-xl">{subtitle}</p>
+    <a href="/" class="flex h-12 items-center justify-center rounded-xl border border-primary/30 bg-primary/5 px-8 font-bold text-primary hover:bg-primary/10 transition-colors">
+      ← Volver al inicio
+    </a>
+  </div>
+</section>
