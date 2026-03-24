@@ -1,0 +1,124 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { LESSONS } from '../../../data/cursos/c';
+
+export function getStaticPaths() {
+  return LESSONS.map(lesson => ({
+    params: { lesson: lesson.slug },
+    props:  { lesson },
+  }));
+}
+
+const { lesson } = Astro.props;
+const idx   = LESSONS.findIndex(l => l.slug === lesson.slug);
+const prev  = idx > 0            ? LESSONS[idx - 1] : null;
+const next  = idx < LESSONS.length - 1 ? LESSONS[idx + 1] : null;
+---
+<Layout title={`${lesson.num}. ${lesson.title} — C — CodeNinja`}>
+  <Header />
+  <main class="flex-1 py-10 px-4 lg:px-20">
+    <div class="mx-auto max-w-3xl">
+
+      <!-- Breadcrumb -->
+      <nav class="mb-8 flex items-center gap-2 font-mono text-xs text-slate-400">
+        <a href="/cursos" class="hover:text-primary transition-colors">cursos</a>
+        <span>/</span>
+        <a href="/cursos/c" class="hover:text-primary transition-colors">c</a>
+        <span>/</span>
+        <span class="text-slate-500 dark:text-slate-300">{lesson.slug}</span>
+      </nav>
+
+      <!-- Header de la lección -->
+      <div class="mb-10">
+        <div class="mb-3 flex items-center gap-3">
+          <span class="rounded-lg border border-primary/20 bg-primary/10 px-2.5 py-0.5 font-mono text-xs text-primary">
+            Lección {String(lesson.num).padStart(2, '0')}
+          </span>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 md:text-4xl">{lesson.title}</h1>
+        <p class="mt-3 text-slate-500 dark:text-slate-400">{lesson.desc}</p>
+        <div class="mt-4 rounded-xl border border-accent-blue/20 bg-accent-blue/5 px-5 py-3 text-sm text-accent-blue">
+          <strong>Objetivo:</strong> {lesson.objetivo}
+        </div>
+      </div>
+
+      <!-- Secciones de contenido -->
+      <div class="flex flex-col gap-10">
+        {lesson.sections.map((section) => (
+          <section class="flex flex-col gap-4">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <span class="h-1 w-4 rounded-full bg-primary inline-block"></span>
+              {section.title}
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed">{section.body}</p>
+
+            {section.code && (
+              <div class="rounded-xl border border-slate-200 dark:border-slate-700/50 overflow-hidden">
+                <!-- Barra de título del bloque de código -->
+                <div class="flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900 px-4 py-2">
+                  <span class="h-2.5 w-2.5 rounded-full bg-red-400"></span>
+                  <span class="h-2.5 w-2.5 rounded-full bg-yellow-400"></span>
+                  <span class="h-2.5 w-2.5 rounded-full bg-green-400"></span>
+                  <span class="ml-2 font-mono text-xs text-slate-400">main.c</span>
+                </div>
+                <pre class="overflow-x-auto bg-slate-50 dark:bg-[#0d1117] p-5 font-mono text-sm text-slate-800 dark:text-slate-300 leading-relaxed"><code>{section.code}</code></pre>
+              </div>
+            )}
+
+            {section.note && (
+              <div class="rounded-xl border border-primary/20 bg-primary/5 px-5 py-3 text-sm text-slate-700 dark:text-slate-300">
+                <span class="font-bold text-primary">💡 Nota: </span>{section.note}
+              </div>
+            )}
+          </section>
+        ))}
+      </div>
+
+      <!-- Navegación prev/next -->
+      <div class="mt-14 flex items-center justify-between border-t border-slate-200 dark:border-slate-700/50 pt-8">
+        {prev ? (
+          <a
+            href={`/cursos/c/${prev.slug}`}
+            class="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 px-5 py-3 transition-all hover:border-primary/40 hover:text-primary"
+          >
+            <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            <div class="text-right">
+              <div class="text-xs text-slate-400 font-mono">anterior</div>
+              <div class="text-sm font-semibold">{prev.title}</div>
+            </div>
+          </a>
+        ) : (
+          <a
+            href="/cursos/c"
+            class="group flex items-center gap-2 text-sm text-slate-400 hover:text-primary transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Volver al curso
+          </a>
+        )}
+
+        {next && (
+          <a
+            href={`/cursos/c/${next.slug}`}
+            class="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 px-5 py-3 transition-all hover:border-primary/40 hover:text-primary"
+          >
+            <div>
+              <div class="text-xs text-slate-400 font-mono">siguiente</div>
+              <div class="text-sm font-semibold">{next.title}</div>
+            </div>
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+        )}
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>

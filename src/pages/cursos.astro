@@ -2,16 +2,102 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import ComingSoon from '../components/ComingSoon.astro';
+
+const courses = [
+  {
+    title: 'Programación en C',
+    slug: 'c',
+    description: 'Domina el lenguaje C desde cero: memoria, punteros y estructuras de datos.',
+    lessons: 16,
+    badge: 'Noob',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-12 h-12"><path fill="#283593" d="M24 4L4 14v20l20 10 20-10V14z"/><path fill="#5c6bc0" d="M24 4v30L4 24V14z"/><path fill="#fff" d="M30.9 31.6c-1.5.8-3.2 1.3-5.1 1.3-5.7 0-9.6-3.8-9.6-9.4 0-5.5 4-9.4 9.7-9.4 1.8 0 3.4.4 4.8 1.2l-1.6 3c-.9-.5-1.9-.8-3-.8-3.4 0-5.6 2.4-5.6 5.9 0 3.6 2.2 6 5.7 6 1.1 0 2.2-.3 3.1-.8l1.6 3z"/></svg>`,
+  },
+  {
+    title: 'Git & GitHub',
+    slug: 'git',
+    description: 'Controlá versiones de tus proyectos y colaborá en equipo con Git y GitHub.',
+    lessons: 3,
+    badge: 'Noob',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-12 h-12"><path fill="#F4511E" d="M44.7 21.3L26.7 3.3a2.3 2.3 0 00-3.3 0l-3.3 3.3 4.2 4.2a2.7 2.7 0 013.4 3.4l4 4a2.7 2.7 0 11-1.6 1.6l-3.8-3.8v9.9a2.7 2.7 0 11-2.2 0V15.7a2.7 2.7 0 01-1.4-3.5L18.5 8 3.3 23.3a2.3 2.3 0 000 3.3l18 18a2.3 2.3 0 003.3 0l20-20a2.3 2.3 0 00.1-3.3z"/></svg>`,
+  },
+  {
+    title: 'Java',
+    slug: 'java',
+    description: 'Aprendé programación orientada a objetos con uno de los lenguajes más usados del mundo.',
+    lessons: 12,
+    badge: 'Noob',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-12 h-12"><path fill="#F44336" d="M23.6 19.2s-3.3 2-10.2 2.2c0 0 5.1 1.4 10.3-.6 5.3 2 10.3.6 10.3.6-6.9-.2-10.4-2.2-10.4-2.2z"/><path fill="#F44336" d="M22.4 17.9s-3.7 2.3-11.5 2.5c0 0 5.7 1.5 11.6-.7 5.9 2.2 11.6.7 11.6.7-7.8-.2-11.7-2.5-11.7-2.5z"/><path fill="#FF9800" d="M21.5 6S14 9.5 17 15.4c1.3 2.5 4 3.5 6 5.3 2 1.8 2.5 4.6.8 7.2 0 0 4.3-3.8 1.6-8.4-.9-1.7-2.6-2.8-3.9-4.3C19.2 12.8 19.5 9.4 21.5 6z"/><path fill="#FF9800" d="M25.6 12.5s1.4 4.5-2.7 7.5c0 0 4.8-.3 5.3-5.3-.5-1.3-2.6-2.2-2.6-2.2z"/><path fill="#1565C0" d="M28.8 32.9c4.4-.3 9.5-2.5 9.5-5.3 0 0-.3 1.3-3.8 2.5-4 1.4-8.7 1.5-11.5.3 0 0 1.5 2.7 5.8 2.5z"/><path fill="#1565C0" d="M30.2 35.3c4.9-.4 10.5-2.8 10.5-5.9 0 0-.3 1.5-4.2 2.8-4.5 1.6-9.7 1.7-12.9.4 0 0 1.7 3 6.6 2.7z"/><path fill="#1565C0" d="M15.7 39.7s1.2.9 3.8 1.3c4.3.5 11.4.4 15.4-2.5 0 0-1.2 1-5 1.8-3.9.8-9.9.8-14.2-.6z"/></svg>`,
+  },
+  {
+    title: 'JavaScript',
+    slug: 'javascript',
+    description: 'El lenguaje de la web. Aprendé JS desde los fundamentos hasta funciones avanzadas.',
+    lessons: 20,
+    badge: 'Noob',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-12 h-12"><path fill="#ffd600" d="M6 42V6h36v36z"/><path fill="#000001" d="M29.5 32.2c.6 1 1.4 1.7 2.7 1.7 1.2 0 1.9-.6 1.9-1.4 0-1-.8-1.3-2-1.9l-.7-.3c-2-.8-3.3-1.9-3.3-4.1 0-2 1.5-3.6 3.9-3.6 1.7 0 2.9.6 3.8 2.1l-2.1 1.4c-.5-.8-1-.7-1.7-.7-.8 0-1.3.5-1.3 1.1 0 .8.5 1.1 1.6 1.6l.7.3c2.3 1 3.6 2 3.6 4.3 0 2.5-1.9 3.8-4.5 3.8-2.5 0-4.1-1.2-4.9-2.8l2.3-1.5zm-10.3.3c.4.7.8 1.3 1.7 1.3.9 0 1.4-.3 1.4-1.6V22.7h2.7v9.6c0 2.6-1.5 3.8-3.8 3.8-2 0-3.2-1-3.8-2.3l1.8-1.3z"/></svg>`,
+  },
+];
 ---
 <Layout title="Cursos — CodeNinja">
   <Header />
-  <main class="flex-1 flex flex-col">
-    <ComingSoon
-      title="Cursos"
-      subtitle="Estamos preparando el contenido del curso. Pronto vas a poder acceder a todas las clases y materiales."
-      emoji="📚"
-    />
+  <main class="flex-1">
+    <!-- Hero -->
+    <section class="py-16 px-4 lg:px-20">
+      <div class="mx-auto max-w-7xl">
+        <div class="mb-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-mono text-primary">
+          <span class="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+          cursos disponibles
+        </div>
+        <h1 class="mt-4 text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl">
+          Aprendé a <span class="text-primary">programar</span>
+        </h1>
+        <p class="mt-4 max-w-xl text-slate-500 dark:text-slate-400 text-lg">
+          Cursos diseñados para estudiantes de UTN. Desde cero, paso a paso, con ejemplos reales.
+        </p>
+      </div>
+    </section>
+
+    <!-- Course Grid -->
+    <section class="pb-24 px-4 lg:px-20">
+      <div class="mx-auto max-w-7xl grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {courses.map(course => (
+          <div class="group relative flex flex-col rounded-2xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_-5px_rgba(163,230,53,0.25)] hover:border-primary/30">
+            <!-- Badge -->
+            <div class="mb-4 flex items-center justify-between">
+              <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-0.5 text-xs font-mono font-medium text-primary">
+                {course.badge}
+              </span>
+              <div class="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500 font-mono">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                {course.lessons} lecciones
+              </div>
+            </div>
+
+            <!-- Icon -->
+            <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-700/50">
+              <Fragment set:html={course.icon} />
+            </div>
+
+            <!-- Title & Description -->
+            <h2 class="mb-2 text-xl font-bold text-slate-900 dark:text-slate-100">{course.title}</h2>
+            <p class="flex-1 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{course.description}</p>
+
+            <!-- Button -->
+            <a
+              href={`/cursos/${course.slug}`}
+              class="mt-6 flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-background-dark group-hover:border-primary"
+            >
+              Ver curso
+              <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
   </main>
   <Footer />
 </Layout>

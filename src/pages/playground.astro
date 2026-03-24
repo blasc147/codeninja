@@ -1,17 +1,368 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import ComingSoon from '../components/ComingSoon.astro';
 ---
 <Layout title="Playground — CodeNinja">
   <Header />
-  <main class="flex-1 flex flex-col">
-    <ComingSoon
-      title="Playground"
-      subtitle="Esta sección está en construcción. Pronto vas a poder acceder a contenido interactivo acá."
-      emoji="🚀"
-    />
-  </main>
-  <Footer />
+  <div class="flex flex-col" style="height: calc(100vh - 73px);">
+
+    <!-- Toolbar -->
+    <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/80 px-4 py-2 shrink-0 flex-wrap">
+      <!-- Language selector -->
+      <div class="flex items-center gap-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-1 py-0.5">
+        {['JavaScript', 'Java', 'C', 'Python'].map((lang, i) => (
+          <button
+            class={`lang-btn rounded-md px-3 py-1.5 text-xs font-mono transition-all ${i === 0 ? 'bg-primary text-background-dark font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-primary'}`}
+            data-lang={lang.toLowerCase()}
+          >
+            {lang}
+          </button>
+        ))}
+      </div>
+
+      <div class="flex items-center gap-2 ml-auto">
+        <button
+          id="run-btn"
+          class="flex items-center gap-2 rounded-lg bg-primary px-5 py-1.5 text-xs font-bold text-background-dark transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          RUN
+        </button>
+        <button
+          id="reset-btn"
+          class="rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-mono text-slate-400 hover:text-primary transition-colors"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Editor + panels -->
+    <div class="flex flex-1 overflow-hidden">
+
+      <!-- Code editor -->
+      <div class="flex flex-col flex-1 border-r border-slate-200 dark:border-slate-700/50 min-w-0">
+        <!-- File tab -->
+        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 text-xs font-mono shrink-0">
+          <span class="flex items-center gap-1.5 text-slate-900 dark:text-slate-100 border-b-2 border-primary pb-1">
+            <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+              <path d="M14 2v6h6"/>
+            </svg>
+            <span id="file-label">main.js</span>
+          </span>
+        </div>
+
+        <textarea
+          id="code-editor"
+          spellcheck="false"
+          autocomplete="off"
+          class="flex-1 w-full resize-none bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-sm text-slate-800 dark:text-slate-200 focus:outline-none leading-relaxed"
+        ></textarea>
+      </div>
+
+      <!-- Right panels -->
+      <div class="flex flex-col w-80 xl:w-96 shrink-0">
+
+        <!-- Stdin -->
+        <div class="flex flex-col border-b border-slate-200 dark:border-slate-700/50" style="height: 30%;">
+          <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 shrink-0">
+            <span class="h-2 w-2 rounded-full bg-slate-400"></span>
+            <span class="font-mono text-xs text-slate-400">entrada de datos (stdin)</span>
+          </div>
+          <textarea
+            id="stdin"
+            spellcheck="false"
+            placeholder="Ingresá datos de entrada separados por newline..."
+            class="flex-1 resize-none bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-xs text-slate-500 dark:text-slate-400 focus:outline-none placeholder:text-slate-600"
+          ></textarea>
+        </div>
+
+        <!-- Output terminal -->
+        <div class="flex flex-col flex-1 min-h-0">
+          <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 shrink-0">
+            <div class="flex items-center gap-2">
+              <span id="output-indicator" class="h-2 w-2 rounded-full bg-slate-400"></span>
+              <span class="font-mono text-xs text-slate-400">output</span>
+            </div>
+            <button id="clear-btn" class="font-mono text-xs text-slate-500 hover:text-primary transition-colors">limpiar</button>
+          </div>
+          <pre
+            id="output"
+            class="flex-1 overflow-auto bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-xs text-slate-500 dark:text-slate-400 whitespace-pre-wrap"
+          ><span class="text-slate-500 dark:text-slate-600">// Esperando ejecución...</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="flex items-center justify-between border-t border-slate-200 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900 px-4 py-1 font-mono text-xs text-slate-400 shrink-0">
+      <div class="flex items-center gap-4">
+        <span id="status-lang" class="text-primary">JavaScript</span>
+        <span>UTF-8</span>
+        <span id="cursor-pos">Ln 1, Col 1</span>
+      </div>
+      <div id="status-msg" class="text-slate-500">listo</div>
+    </div>
+  </div>
 </Layout>
+
+<style>
+  #code-editor { tab-size: 2; }
+  .output-stdout { color: #e2e8f0; }
+  .output-stderr { color: #f87171; }
+  .output-success { color: #a3e635; }
+  .output-info    { color: #60a5fa; }
+  .output-error   { color: #f87171; }
+</style>
+
+<script>
+  const DEFAULTS: Record<string, string> = {
+    javascript: `// Hola mundo en JavaScript
+console.log("¡Hola, mundo!");
+
+let nombre = "CodeNinja";
+let version = 1;
+console.log(\`Bienvenido a \${nombre} v\${version}\`);`,
+    java: `// Hola mundo en Java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("¡Hola, mundo!");
+        String nombre = "CodeNinja";
+        System.out.println("Bienvenido a " + nombre);
+    }
+}`,
+    c: `// Hola mundo en C
+#include <stdio.h>
+
+int main() {
+    printf("¡Hola, mundo!\\n");
+    printf("Bienvenido a CodeNinja\\n");
+    return 0;
+}`,
+    python: `# Hola mundo en Python
+print("¡Hola, mundo!")
+
+nombre = "CodeNinja"
+version = 1
+print(f"Bienvenido a {nombre} v{version}")`,
+  };
+
+  const FILE_NAMES: Record<string, string> = {
+    javascript: 'main.js',
+    java: 'Main.java',
+    c: 'main.c',
+    python: 'main.py',
+  };
+
+  const LANG_LABELS: Record<string, string> = {
+    javascript: 'JavaScript',
+    java: 'Java',
+    c: 'C',
+    python: 'Python',
+  };
+
+  // Elements
+  const editor      = document.getElementById('code-editor') as HTMLTextAreaElement;
+  const stdinEl     = document.getElementById('stdin') as HTMLTextAreaElement;
+  const outputEl    = document.getElementById('output') as HTMLPreElement;
+  const fileLabel   = document.getElementById('file-label') as HTMLSpanElement;
+  const statusLang  = document.getElementById('status-lang') as HTMLSpanElement;
+  const statusMsg   = document.getElementById('status-msg') as HTMLDivElement;
+  const cursorPos   = document.getElementById('cursor-pos') as HTMLSpanElement;
+  const runBtn      = document.getElementById('run-btn') as HTMLButtonElement;
+  const resetBtn    = document.getElementById('reset-btn') as HTMLButtonElement;
+  const clearBtn    = document.getElementById('clear-btn') as HTMLButtonElement;
+  const indicator   = document.getElementById('output-indicator') as HTMLSpanElement;
+  const langBtns    = document.querySelectorAll<HTMLButtonElement>('.lang-btn');
+
+  let currentLang = 'javascript';
+
+  // Init editor
+  editor.value = DEFAULTS[currentLang];
+
+  // Language switching
+  langBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentLang = btn.dataset.lang!;
+      langBtns.forEach(b => {
+        b.classList.remove('bg-primary', 'text-background-dark', 'font-bold');
+        b.classList.add('text-slate-500', 'dark:text-slate-400');
+      });
+      btn.classList.add('bg-primary', 'text-background-dark', 'font-bold');
+      btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+      editor.value = DEFAULTS[currentLang];
+      fileLabel.textContent = FILE_NAMES[currentLang];
+      statusLang.textContent = LANG_LABELS[currentLang];
+      setOutput('<span class="text-slate-500 dark:text-slate-600">// Esperando ejecución...</span>');
+      setStatus('listo');
+    });
+  });
+
+  // JavaScript: runs entirely in the browser via Web Worker (no API needed)
+  function runJavaScriptInBrowser(code: string): Promise<{ stdout: string; stderr: string; exit_code: number }> {
+    return new Promise(resolve => {
+      const workerSrc = `
+        const _logs = [];
+        const _cap = (...args) => _logs.push(args.map(a => {
+          if (typeof a === 'object' && a !== null) { try { return JSON.stringify(a); } catch { return String(a); } }
+          return String(a);
+        }).join(' '));
+        console.log = _cap;
+        console.info = _cap;
+        console.warn = (...args) => _logs.push('⚠ ' + args.join(' '));
+        console.error = (...args) => _logs.push('✖ ' + args.join(' '));
+        let _exitCode = 0;
+        try {
+          ${code}
+        } catch(e) {
+          _exitCode = 1;
+          _logs.push('Error: ' + e.message);
+        }
+        self.postMessage({ stdout: _logs.join('\\n'), stderr: '', exit_code: _exitCode });
+      `;
+      const blob = new Blob([workerSrc], { type: 'text/javascript' });
+      const url  = URL.createObjectURL(blob);
+      const worker = new Worker(url);
+
+      const timeout = setTimeout(() => {
+        worker.terminate();
+        URL.revokeObjectURL(url);
+        resolve({ stdout: '', stderr: 'Error: tiempo límite excedido (5s)', exit_code: 1 });
+      }, 5000);
+
+      worker.onmessage = e => {
+        clearTimeout(timeout);
+        worker.terminate();
+        URL.revokeObjectURL(url);
+        resolve(e.data);
+      };
+      worker.onerror = e => {
+        clearTimeout(timeout);
+        worker.terminate();
+        URL.revokeObjectURL(url);
+        resolve({ stdout: '', stderr: 'Error: ' + e.message, exit_code: 1 });
+      };
+    });
+  }
+
+  // Backend execution for Java / C / Python via Judge0 CE
+  async function runViaAPI(code: string, language: string, stdin: string) {
+    const res = await fetch('/api/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, language, stdin }),
+    });
+    const data = await res.json() as {
+      stdout?: string; stderr?: string; compile_error?: string;
+      exit_code?: number; status?: string; error?: string;
+    };
+    if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
+    return data;
+  }
+
+  // Run
+  runBtn.addEventListener('click', async () => {
+    const code = editor.value.trim();
+    if (!code) return;
+
+    setRunning(true);
+    setStatus('ejecutando...');
+    indicator.className = 'h-2 w-2 rounded-full bg-primary animate-pulse';
+    setOutput('<span class="output-info">// Ejecutando...</span>');
+
+    try {
+      let result: { stdout?: string; stderr?: string; compile_error?: string; exit_code?: number };
+
+      if (currentLang === 'javascript') {
+        result = await runJavaScriptInBrowser(code);
+      } else {
+        result = await runViaAPI(code, currentLang, stdinEl.value);
+      }
+
+      let out = '';
+      if (result.compile_error) {
+        out += `<span class="output-stderr">── Error de compilación ──\n${escHtml(result.compile_error)}</span>\n`;
+      }
+      if (result.stdout) {
+        out += `<span class="output-stdout">${escHtml(result.stdout)}</span>`;
+      }
+      if (result.stderr) {
+        out += `${result.stdout ? '\n' : ''}<span class="output-stderr">── stderr ──\n${escHtml(result.stderr)}</span>`;
+      }
+      if (!result.stdout && !result.stderr && !result.compile_error) {
+        out = '<span class="text-slate-500">// Sin output</span>';
+      }
+
+      const exitCode = result.exit_code ?? 0;
+      out += `\n\n<span class="${exitCode === 0 ? 'output-success' : 'output-error'}">── exit code ${exitCode} ──</span>`;
+
+      setOutput(out);
+      indicator.className = `h-2 w-2 rounded-full ${exitCode === 0 ? 'bg-primary' : 'bg-red-400'}`;
+      setStatus(exitCode === 0 ? 'éxito' : `exit ${exitCode}`);
+
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setOutput(`<span class="output-error">Error: ${escHtml(msg)}</span>`);
+      indicator.className = 'h-2 w-2 rounded-full bg-red-400';
+      setStatus('error');
+    } finally {
+      setRunning(false);
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    editor.value = DEFAULTS[currentLang];
+    stdinEl.value = '';
+    setOutput('<span class="text-slate-500 dark:text-slate-600">// Esperando ejecución...</span>');
+    indicator.className = 'h-2 w-2 rounded-full bg-slate-400';
+    setStatus('listo');
+  });
+
+  clearBtn.addEventListener('click', () => {
+    setOutput('<span class="text-slate-500 dark:text-slate-600">// Output limpiado</span>');
+    indicator.className = 'h-2 w-2 rounded-full bg-slate-400';
+  });
+
+  // Cursor position tracker
+  editor.addEventListener('keyup', updateCursor);
+  editor.addEventListener('click', updateCursor);
+
+  // Tab key support in editor
+  editor.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+      editor.selectionStart = editor.selectionEnd = start + 2;
+    }
+  });
+
+  function updateCursor() {
+    const lines = editor.value.substring(0, editor.selectionStart).split('\n');
+    cursorPos.textContent = `Ln ${lines.length}, Col ${lines[lines.length - 1].length + 1}`;
+  }
+
+  function setOutput(html: string) {
+    outputEl.innerHTML = html;
+    outputEl.scrollTop = outputEl.scrollHeight;
+  }
+
+  function setStatus(msg: string) {
+    statusMsg.textContent = msg;
+  }
+
+  function setRunning(on: boolean) {
+    runBtn.disabled = on;
+    runBtn.innerHTML = on
+      ? `<svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Ejecutando...`
+      : `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> RUN`;
+  }
+
+  function escHtml(str: string): string {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+</script>
